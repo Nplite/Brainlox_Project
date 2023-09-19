@@ -1,6 +1,5 @@
 import streamlit as st
 import os
-from PyPDF2 import PdfReader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
@@ -8,65 +7,20 @@ from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 from htmlT import css, bot_template, user_template
-from langchain.llms import HuggingFaceHub
-from transformers import GPT2TokenizerFast
-import altair as alt
-from PyPDF2 import PdfReader
-from langchain.document_loaders import PyPDFLoader
-import PyPDF2
 from dotenv import find_dotenv, load_dotenv
 load_dotenv(find_dotenv())
 from langchain.document_loaders import UnstructuredURLLoader
-import requests
-from bs4 import BeautifulSoup
 
 
 
 
-# Set Slack API credentials
-OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 
-# url = ["https://brainlox.com/courses/category/technical"]
-# loaders = UnstructuredURLLoader(urls=url)
-# data = loaders.load()
+OPENAI_API_KEY = "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"
 
+url = ["https://brainlox.com/courses/category/technical"]
+loaders = UnstructuredURLLoader(urls=url)
+data = loaders.load()
 
-
-def load_text_from_url(url):
-  res = requests.get(url)
-  html = res.text
-
-  soup = BeautifulSoup(html, 'html.parser')
-
-  # Remove script and style tags
-  for script in soup(["script", "style"]):
-    script.extract()
-
-  # Get text
-  text = soup.get_text()
-
-  # Break into lines and remove leading and trailing space on each
-  lines = (line.strip() for line in text.splitlines())
-  # Break multi-headlines into a line each
-  chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-  # Drop blank lines
-  text = '\n'.join(chunk for chunk in chunks if chunk)
-
-  return text
-
-url = "https://brainlox.com/courses/category/technical"
-data = load_text_from_url(url)
-
-# # You MUST add your PDF to local files in this notebook (folder icon on left hand side of screen)
-# def extract_text_from_pdf(file_path):
-#     with open(file_path, 'rb') as file:
-#         pdf_reader = PyPDF2.PdfReader(file)
-#         text = ""
-#         for page in pdf_reader.pages:
-#             text += page.extract_text()
-#     return text
-
-# pdf_text = extract_text_from_pdf('./Documents/export_to_europe_guide.pdf')
 
 # Create the "Text_Data" folder if it doesn't exist
 folder_path = 'Text_Data'
@@ -126,7 +80,9 @@ def handle_userinput(user_question):
                 "{{MSG}}", message.content), unsafe_allow_html=True)
 
 
+
 def main():
+
 
     st.write(css, unsafe_allow_html=True)
 
@@ -142,14 +98,13 @@ def main():
     <style>
         .stTextInput {{
         position: fixed;
-        bottom: 3rem;
+        bottom: 0.5rem;
     }}
     </style>
     """
 
     st.markdown(styl, unsafe_allow_html=True)
-
-
+    
 
     if "conversation" not in st.session_state:
         st.session_state.conversation = None
@@ -157,12 +112,12 @@ def main():
         st.session_state.chat_history = None
 
     
-    user_question = st.text_input("About Trade Compliance:")
+    user_question = st.text_input("About Brainlox Courses:")
     if user_question:
         handle_userinput(user_question)
 
     with st.sidebar:
-        st.header("Trade Chat :books:")
+        st.header("Brainlox ChatBot :books:")
 
         with st.spinner("Processing"):
                 # get pdf text
@@ -178,10 +133,8 @@ def main():
                 # create conversation chain
             st.session_state.conversation = get_conversation_chain(
                 vectorstore)
-               
-        st.markdown("[Made by: Varahi Technology](https://varahitechnologies.com/)")
 
-
+        st.markdown("[Made by: Brainlox ](https://brainlox.com/)")
 
 
 if __name__ == '__main__':
